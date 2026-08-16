@@ -14,7 +14,10 @@
 - separate benchmark-only negative fixtures and a customer-owned DIY substitute.
 
 The Pro App installation is intended for this repository only. No repository-wide
-installation or customer repository access is required.
+installation or customer repository access is required. At the time of this sprint,
+GitHub owner sudo / Confirm access was still required before the App could be installed
+here; the README and benchmark results do not claim a Pro Check until that manual step
+is complete.
 
 ## Reproduce the fixture locally
 
@@ -36,6 +39,10 @@ real platform. The benchmark workflow selects flows from the pull-request branch
 - binary image evidence inside extracted artifacts;
 - workflow completion to Pro Check creation/completion where observable;
 - READY, HOLD, INCOMPLETE, IGNORED, and redelivery behavior.
+
+The published `diy-substitute/` directory is a separate red-team implementation built
+from public documentation. It contains BASIC, ARTIFACT, and HARDENED levels and is not
+copied from private Pro code.
 
 ## What is not measured
 
