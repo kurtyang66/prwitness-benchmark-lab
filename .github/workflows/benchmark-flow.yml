@@ -1,0 +1,53 @@
+name: PRWitness benchmark flow
+
+on:
+  workflow_call:
+    inputs:
+      flow_id:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Verify Node 24
+        run: |
+          set -euo pipefail
+          node --version
+          test "$(node -p 'process.versions.node.split(".")[0]')" = 24
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Run PRWitness Free Action flow ${{ inputs.flow_id }}
+        id: proof
+        uses: kurtyang66/prwitness-action@v1
+        with:
+          flow: Flow ${{ inputs.flow_id }}
+          config: prwitness.config.ts
+          comment: false
+          upload-artifact: true
+          retention-days: 14
+      - name: Verify binary evidence
+        env:
+          RUN_ID: ${{ steps.proof.outputs.run-id }}
+          RESULT: ${{ steps.proof.outputs.result }}
+        run: |
+          set -euo pipefail
+          test "$RESULT" = PASS
+          test -n "$RUN_ID"
+          test -s ".prwitness/runs/$RUN_ID/manifest.json"
+          find ".prwitness/runs/$RUN_ID" -type f -name '*.png' -size +0c -print -quit | grep .

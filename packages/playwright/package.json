@@ -1,0 +1,12 @@
+{
+  "name": "@prwitness/playwright",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js"
+  },
+  "peerDependencies": {
+    "@playwright/test": "1.54.2"
+  }
+}

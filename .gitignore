@@ -1,0 +1,10 @@
+node_modules/
+playwright-report/
+test-results/
+.prwitness/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log

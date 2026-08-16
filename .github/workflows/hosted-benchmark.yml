@@ -1,0 +1,43 @@
+name: PRWitness hosted benchmark
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  flow_1:
+    if: github.event.pull_request.head.ref == 'bench-1'
+    uses: ./.github/workflows/benchmark-flow.yml
+    with:
+      flow_id: "01"
+  flow_3:
+    if: github.event.pull_request.head.ref == 'bench-3'
+    strategy:
+      fail-fast: false
+      matrix:
+        flow_id: ["01", "02", "03"]
+    uses: ./.github/workflows/benchmark-flow.yml
+    with:
+      flow_id: ${{ matrix.flow_id }}
+  flow_10:
+    if: github.event.pull_request.head.ref == 'bench-10'
+    strategy:
+      fail-fast: false
+      matrix:
+        flow_id: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
+    uses: ./.github/workflows/benchmark-flow.yml
+    with:
+      flow_id: ${{ matrix.flow_id }}
+  flow_25:
+    if: github.event.pull_request.head.ref == 'bench-25'
+    strategy:
+      fail-fast: false
+      matrix:
+        flow_id: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25"]
+    uses: ./.github/workflows/benchmark-flow.yml
+    with:
+      flow_id: ${{ matrix.flow_id }}

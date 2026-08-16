@@ -1,0 +1,95 @@
+name: PRWitness negative benchmark fixtures
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  hold_3:
+    if: github.event.pull_request.head.ref == 'bench-hold-3'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flow_id: ["01", "02", "03"]
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.15.0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Run deterministic HOLD flow ${{ matrix.flow_id }}
+        id: proof
+        uses: kurtyang66/prwitness-action@v1
+        continue-on-error: true
+        with:
+          flow: Hold Flow ${{ matrix.flow_id }}
+          config: prwitness.config.ts
+          comment: false
+          upload-artifact: true
+          retention-days: 14
+
+  hold_10:
+    if: github.event.pull_request.head.ref == 'bench-hold-10'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flow_id: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: pnpm/action-setup@v4
+        with: { version: 10.15.0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Run deterministic HOLD flow ${{ matrix.flow_id }}
+        id: proof
+        uses: kurtyang66/prwitness-action@v1
+        continue-on-error: true
+        with:
+          flow: Hold Flow ${{ matrix.flow_id }}
+          config: prwitness.config.ts
+          comment: false
+          upload-artifact: true
+          retention-days: 14
+
+  incomplete:
+    if: github.event.pull_request.head.ref == 'bench-incomplete'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - name: Create benchmark-only malformed fixture
+        run: |
+          set -euo pipefail
+          mkdir -p benchmark-malformed
+          printf '%s\n' 'BENCHMARK MALFORMED FIXTURE' > benchmark-malformed/not-a-manifest.txt
+          printf '%s\n' '{"schemaVersion":"invalid","repository":"wrong"}' > benchmark-malformed/manifest.json
+      - name: Upload malformed PRWitness-shaped artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prwitness-benchmark-malformed
+          path: benchmark-malformed
+          if-no-files-found: error
+
+  ignored:
+    if: github.event.pull_request.head.ref == 'bench-ignored'
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo 'Completed workflow intentionally contains zero PRWitness artifacts.'
+          echo 'Expected Pro behavior: IGNORED and no PRWitness Check.'

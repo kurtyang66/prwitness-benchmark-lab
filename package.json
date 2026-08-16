@@ -1,0 +1,20 @@
+{
+  "name": "prwitness-benchmark-lab",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "build": "node -e \"console.log('synthetic benchmark fixture build ok')\"",
+    "start": "python3 -m http.server {port} --bind 127.0.0.1 --directory public",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "@prwitness/config": "file:packages/config",
+    "@prwitness/playwright": "file:packages/playwright"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.54.2",
+    "playwright": "1.54.2"
+  }
+}
