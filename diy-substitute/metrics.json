@@ -1,0 +1,110 @@
+{
+  "dependencies": {
+    "external_actions": [
+      "actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683"
+    ],
+    "runtime_third_party": [],
+    "setup": [
+      "Python 3.11+",
+      "No package installation",
+      "No Node/pnpm/Playwright/FFmpeg required by evaluator"
+    ],
+    "stdlib_modules": [
+      "argparse",
+      "dataclasses",
+      "enum",
+      "hashlib",
+      "io",
+      "json",
+      "pathlib",
+      "re",
+      "stat",
+      "typing",
+      "urllib",
+      "zipfile"
+    ],
+    "test_third_party": []
+  },
+  "loc": {
+    "documentation": 102,
+    "metrics_tool": 114,
+    "source": 619,
+    "source_files": {
+      "diy/__init__.py": 7,
+      "diy/artifacts.py": 183,
+      "diy/cli.py": 127,
+      "diy/core.py": 117,
+      "diy/github_api.py": 91,
+      "diy/hardened.py": 94
+    },
+    "test_files": {
+      "tests/test_scenario_matrix.py": 211,
+      "tests/test_static_security.py": 42
+    },
+    "tests": 253,
+    "workflow_files": {
+      "workflows/diy-artifact.yml": 29,
+      "workflows/diy-basic.yml": 24,
+      "workflows/diy-hardened.yml": 25
+    },
+    "workflows": 78
+  },
+  "maintenance_surface": {
+    "configuration_knobs": [
+      "expected_workflow_name",
+      "repository",
+      "API base URL",
+      "artifact/archive/result size limits"
+    ],
+    "documentation_files": 5,
+    "duplicated_validation_logic": "none between local evaluator and workflow; workflow invokes trusted default-branch evaluator",
+    "external_action_refs": 1,
+    "github_api_endpoints": 2,
+    "implementation_files": 6,
+    "state_values": [
+      "READY",
+      "HOLD",
+      "INCOMPLETE",
+      "IGNORED"
+    ],
+    "test_files": 2,
+    "unverified_external_dependencies": [
+      "customer producer emits compatible artifact",
+      "GitHub token/repository policy",
+      "hosted runner Python availability"
+    ],
+    "workflow_files": 3
+  },
+  "measurement_definition": {
+    "dependencies": "runtime/test packages plus workflow action references; no network install performed",
+    "loc": "nonblank, non-comment physical lines; YAML counted as workflow LOC",
+    "source_scope": "diy/*.py excluding diy/metrics.py",
+    "test_scope": "tests/*.py",
+    "workflow_scope": "workflows/*.yml"
+  },
+  "negative_cases": [
+    "malformed",
+    "missing",
+    "SHA conflict",
+    "duplicate",
+    "zip safety",
+    "API failure",
+    "oversize",
+    "digest conflict",
+    "size conflict",
+    "artifact script never executed",
+    "pagination truncation"
+  ],
+  "permissions": {
+    "workflows/diy-artifact.yml": [
+      "contents: read"
+    ],
+    "workflows/diy-basic.yml": [
+      "contents: read"
+    ],
+    "workflows/diy-hardened.yml": [
+      "contents: read",
+      "actions: read"
+    ]
+  }
+}
