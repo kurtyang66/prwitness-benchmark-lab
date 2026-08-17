@@ -14,10 +14,12 @@
 - separate benchmark-only negative fixtures and a customer-owned DIY substitute.
 
 The Pro App installation is intended for this repository only. No repository-wide
-installation or customer repository access is required. At the time of this sprint,
-GitHub owner sudo / Confirm access was still required before the App could be installed
-here; the README and benchmark results do not claim a Pro Check until that manual step
-is complete.
+installation or customer repository access is required. The hosted workflows forward
+the exact `github.event.pull_request.base.sha` through the reusable benchmark workflow
+to the Free Action's `base-ref` input. Each flow prints non-secret PR identity
+diagnostics and verifies that `manifest.baseSha` matches the PR base SHA and
+`manifest.headSha` matches the workflow checkout SHA before the hosted Pro Check is
+read back.
 
 ## Reproduce the fixture locally
 
