@@ -6,6 +6,18 @@ on:
       flow_id:
         required: true
         type: string
+      pr_number:
+        required: true
+        type: number
+      pr_base_sha:
+        required: true
+        type: string
+      pr_head_sha:
+        required: true
+        type: string
+      workflow_sha:
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -32,15 +44,43 @@ jobs:
           test "$(node -p 'process.versions.node.split(".")[0]')" = 24
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Print PR identity diagnostics
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          PR_BASE_SHA: ${{ inputs.pr_base_sha }}
+          PR_HEAD_SHA: ${{ inputs.pr_head_sha }}
+          WORKFLOW_SHA: ${{ inputs.workflow_sha }}
+        run: |
+          set -euo pipefail
+          echo "PR_NUMBER=$PR_NUMBER"
+          echo "PR_BASE_SHA=$PR_BASE_SHA"
+          echo "PR_HEAD_SHA=$PR_HEAD_SHA"
+          echo "WORKFLOW_SHA=$WORKFLOW_SHA"
       - name: Run PRWitness Free Action flow ${{ inputs.flow_id }}
         id: proof
         uses: kurtyang66/prwitness-action@v1
         with:
           flow: Flow ${{ inputs.flow_id }}
           config: prwitness.config.ts
+          base-ref: ${{ inputs.pr_base_sha }}
           comment: false
           upload-artifact: true
           retention-days: 14
+      - name: Verify PRWitness manifest identity
+        env:
+          PR_BASE_SHA: ${{ inputs.pr_base_sha }}
+          WORKFLOW_SHA: ${{ inputs.workflow_sha }}
+          RUN_ID: ${{ steps.proof.outputs.run-id }}
+        run: |
+          set -euo pipefail
+          manifest_path=".prwitness/runs/$RUN_ID/manifest.json"
+          test -s "$manifest_path"
+          manifest_base_sha="$(jq -r '.baseSha // empty' "$manifest_path")"
+          manifest_head_sha="$(jq -r '.headSha // empty' "$manifest_path")"
+          echo "MANIFEST_BASE_SHA=$manifest_base_sha"
+          echo "MANIFEST_HEAD_SHA=$manifest_head_sha"
+          test "$manifest_base_sha" = "$PR_BASE_SHA"
+          test "$manifest_head_sha" = "$WORKFLOW_SHA"
       - name: Verify binary evidence
         env:
           RUN_ID: ${{ steps.proof.outputs.run-id }}

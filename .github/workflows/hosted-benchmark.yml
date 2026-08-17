@@ -14,6 +14,10 @@ jobs:
     uses: ./.github/workflows/benchmark-flow.yml
     with:
       flow_id: "01"
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_base_sha: ${{ github.event.pull_request.base.sha }}
+      pr_head_sha: ${{ github.event.pull_request.head.sha }}
+      workflow_sha: ${{ github.sha }}
   flow_3:
     if: github.event.pull_request.head.ref == 'bench-3'
     strategy:
@@ -23,6 +27,10 @@ jobs:
     uses: ./.github/workflows/benchmark-flow.yml
     with:
       flow_id: ${{ matrix.flow_id }}
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_base_sha: ${{ github.event.pull_request.base.sha }}
+      pr_head_sha: ${{ github.event.pull_request.head.sha }}
+      workflow_sha: ${{ github.sha }}
   flow_10:
     if: github.event.pull_request.head.ref == 'bench-10'
     strategy:
@@ -32,6 +40,10 @@ jobs:
     uses: ./.github/workflows/benchmark-flow.yml
     with:
       flow_id: ${{ matrix.flow_id }}
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_base_sha: ${{ github.event.pull_request.base.sha }}
+      pr_head_sha: ${{ github.event.pull_request.head.sha }}
+      workflow_sha: ${{ github.sha }}
   flow_25:
     if: github.event.pull_request.head.ref == 'bench-25'
     strategy:
@@ -41,3 +53,7 @@ jobs:
     uses: ./.github/workflows/benchmark-flow.yml
     with:
       flow_id: ${{ matrix.flow_id }}
+      pr_number: ${{ github.event.pull_request.number }}
+      pr_base_sha: ${{ github.event.pull_request.base.sha }}
+      pr_head_sha: ${{ github.event.pull_request.head.sha }}
+      workflow_sha: ${{ github.sha }}

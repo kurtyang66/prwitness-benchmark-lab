@@ -27,6 +27,18 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Print PR identity diagnostics
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          WORKFLOW_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "PR_NUMBER=$PR_NUMBER"
+          echo "PR_BASE_SHA=$PR_BASE_SHA"
+          echo "PR_HEAD_SHA=$PR_HEAD_SHA"
+          echo "WORKFLOW_SHA=$WORKFLOW_SHA"
       - name: Run deterministic HOLD flow ${{ matrix.flow_id }}
         id: proof
         uses: kurtyang66/prwitness-action@v1
@@ -34,9 +46,25 @@ jobs:
         with:
           flow: Hold Flow ${{ matrix.flow_id }}
           config: prwitness.config.ts
+          base-ref: ${{ github.event.pull_request.base.sha }}
           comment: false
           upload-artifact: true
           retention-days: 14
+      - name: Verify PRWitness manifest identity
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          WORKFLOW_SHA: ${{ github.sha }}
+          RUN_ID: ${{ steps.proof.outputs.run-id }}
+        run: |
+          set -euo pipefail
+          manifest_path=".prwitness/runs/$RUN_ID/manifest.json"
+          test -s "$manifest_path"
+          manifest_base_sha="$(jq -r '.baseSha // empty' "$manifest_path")"
+          manifest_head_sha="$(jq -r '.headSha // empty' "$manifest_path")"
+          echo "MANIFEST_BASE_SHA=$manifest_base_sha"
+          echo "MANIFEST_HEAD_SHA=$manifest_head_sha"
+          test "$manifest_base_sha" = "$PR_BASE_SHA"
+          test "$manifest_head_sha" = "$WORKFLOW_SHA"
 
   hold_10:
     if: github.event.pull_request.head.ref == 'bench-hold-10'
@@ -56,6 +84,18 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Print PR identity diagnostics
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          WORKFLOW_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          echo "PR_NUMBER=$PR_NUMBER"
+          echo "PR_BASE_SHA=$PR_BASE_SHA"
+          echo "PR_HEAD_SHA=$PR_HEAD_SHA"
+          echo "WORKFLOW_SHA=$WORKFLOW_SHA"
       - name: Run deterministic HOLD flow ${{ matrix.flow_id }}
         id: proof
         uses: kurtyang66/prwitness-action@v1
@@ -63,9 +103,25 @@ jobs:
         with:
           flow: Hold Flow ${{ matrix.flow_id }}
           config: prwitness.config.ts
+          base-ref: ${{ github.event.pull_request.base.sha }}
           comment: false
           upload-artifact: true
           retention-days: 14
+      - name: Verify PRWitness manifest identity
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          WORKFLOW_SHA: ${{ github.sha }}
+          RUN_ID: ${{ steps.proof.outputs.run-id }}
+        run: |
+          set -euo pipefail
+          manifest_path=".prwitness/runs/$RUN_ID/manifest.json"
+          test -s "$manifest_path"
+          manifest_base_sha="$(jq -r '.baseSha // empty' "$manifest_path")"
+          manifest_head_sha="$(jq -r '.headSha // empty' "$manifest_path")"
+          echo "MANIFEST_BASE_SHA=$manifest_base_sha"
+          echo "MANIFEST_HEAD_SHA=$manifest_head_sha"
+          test "$manifest_base_sha" = "$PR_BASE_SHA"
+          test "$manifest_head_sha" = "$WORKFLOW_SHA"
 
   incomplete:
     if: github.event.pull_request.head.ref == 'bench-incomplete'
